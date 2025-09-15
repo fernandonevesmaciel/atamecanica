@@ -121,6 +121,7 @@ if (document.getElementById('form-servico')) {
             formServico.elements.funcionario2.value = servicoParaEditar.nomesFuncionarios[1] || '';
             formServico.elements.funcionario3.value = servicoParaEditar.nomesFuncionarios[2] || '';
             formServico.elements.funcionario4.value = servicoParaEditar.nomesFuncionarios[3] || '';
+            formServico.elements.funcionario5.value = servicoParaEditar.nomesFuncionarios[4] || '';
             formServico.elements.dia.value = servicoParaEditar.dia;
             formServico.elements.horaInicio.value = servicoParaEditar.horaInicio;
             formServico.elements.horaTermino.value = servicoParaEditar.horaTermino;
@@ -150,8 +151,11 @@ if (document.getElementById('form-servico')) {
         const nome2 = formServico.elements.funcionario2.value;
         const nome3 = formServico.elements.funcionario3.value;
         const nome4 = formServico.elements.funcionario4.value;
+        const nome5 = formServico.elements.funcionario5.value;
 
-        const nomesArray = [nome1, nome2, nome3, nome4].filter(nome => nome !== '');
+
+
+        const nomesArray = [nome1, nome2, nome3, nome4, nome5].filter(nome => nome !== '');
 
         if (nomesArray.length === 0) {
             mensagem.textContent = "Selecione pelo menos um funcionário.";
