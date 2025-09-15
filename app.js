@@ -201,6 +201,15 @@ if (document.getElementById('form-servico')) {
             return;
         }
 
+        const confirmarEnvio = confirm("Tem certeza que deseja enviar todos os serviços?");
+    
+
+        if (!confirmarEnvio) {
+            // Opcional: Você pode adicionar uma mensagem para o usuário
+            console.log("Envio cancelado.");
+            return;
+        }
+
         try {
             for (const servico of servicosPendentes) {
                 for (const nome of servico.nomesFuncionarios) {
