@@ -55,6 +55,7 @@ if (document.getElementById('form-login')) {
 }
 
 // Lógica para a página de registro de serviço (index.html)
+// Lógica para a página de registro de serviço (index.html)
 if (document.getElementById('form-servico')) {
     const formServico = document.getElementById('form-servico');
     const btnRegistrar = document.getElementById('btn-registrar');
@@ -78,6 +79,28 @@ if (document.getElementById('form-servico')) {
         localStorage.setItem('servicosPendentes', JSON.stringify(servicosPendentes));
     }
 
+    // Função para limpar os inputs do formulário de funcionário
+    function limparInputsFuncionarios() {
+        formServico.elements.funcionario1.value = '';
+        formServico.elements.funcionario2.value = '';
+        formServico.elements.funcionario3.value = '';
+        formServico.elements.funcionario4.value = '';
+        formServico.elements.funcionario5.value = '';
+    }
+
+    // Função para preencher os inputs de funcionário
+    function preencherInputsFuncionarios(nomes) {
+        // Limpa os campos antes de preencher para garantir que não fiquem valores antigos
+        limparInputsFuncionarios();
+        if (nomes && nomes.length > 0) {
+            formServico.elements.funcionario1.value = nomes[0] || '';
+            formServico.elements.funcionario2.value = nomes[1] || '';
+            formServico.elements.funcionario3.value = nomes[2] || '';
+            formServico.elements.funcionario4.value = nomes[3] || '';
+            formServico.elements.funcionario5.value = nomes[4] || '';
+        }
+    }
+
     // Função para atualizar a tabela na tela
     function atualizarTabelaPendentes() {
         tabelaCorpoPendentes.innerHTML = ''; // Limpa a tabela
@@ -87,8 +110,8 @@ if (document.getElementById('form-servico')) {
                 const row = tabelaCorpoPendentes.insertRow();
                 row.insertCell(0).textContent = servico.nomesFuncionarios.join(', ');
 
-                const dataOriginal = new Date(servico.dia + 'T00:00:00'); // Cria um objeto Date
-                const dataFormatada = dataOriginal.toLocaleDateString('pt-BR'); // Formata a data para DD/MM/AAAA
+                const dataOriginal = new Date(servico.dia + 'T00:00:00');
+                const dataFormatada = dataOriginal.toLocaleDateString('pt-BR');
                 row.insertCell(1).textContent = dataFormatada;
 
                 row.insertCell(2).textContent = servico.horaInicio;
@@ -105,9 +128,16 @@ if (document.getElementById('form-servico')) {
                 celulaAcoes.appendChild(btnEditar);
             });
             btnEnviarTodos.style.display = 'block';
+
+            // Preenche os inputs de funcionário com o último serviço adicionado
+            const ultimoServico = servicosPendentes[servicosPendentes.length - 1];
+            preencherInputsFuncionarios(ultimoServico.nomesFuncionarios);
+
         } else {
             tabelaContainerPendentes.style.display = 'none';
             btnEnviarTodos.style.display = 'none';
+            // Se a lista estiver vazia, limpa os inputs de funcionário
+            limparInputsFuncionarios();
         }
     }
 
@@ -117,11 +147,13 @@ if (document.getElementById('form-servico')) {
             const index = e.target.getAttribute('data-index');
             const servicoParaEditar = servicosPendentes[index];
 
+            // Preenche os inputs com os dados do serviço a ser editado
             formServico.elements.funcionario1.value = servicoParaEditar.nomesFuncionarios[0] || '';
             formServico.elements.funcionario2.value = servicoParaEditar.nomesFuncionarios[1] || '';
             formServico.elements.funcionario3.value = servicoParaEditar.nomesFuncionarios[2] || '';
             formServico.elements.funcionario4.value = servicoParaEditar.nomesFuncionarios[3] || '';
             formServico.elements.funcionario5.value = servicoParaEditar.nomesFuncionarios[4] || '';
+
             formServico.elements.dia.value = servicoParaEditar.dia;
             formServico.elements.horaInicio.value = servicoParaEditar.horaInicio;
             formServico.elements.horaTermino.value = servicoParaEditar.horaTermino;
@@ -129,6 +161,7 @@ if (document.getElementById('form-servico')) {
             formServico.elements.tipoServico.value = servicoParaEditar.tipoServico;
             formServico.elements.turno.value = servicoParaEditar.turno;
 
+            // Remove o serviço da lista para edição
             servicosPendentes.splice(index, 1);
             salvarServicosNoLocalStorage();
             atualizarTabelaPendentes();
@@ -137,7 +170,6 @@ if (document.getElementById('form-servico')) {
         }
     });
 
-    // Evento para o botão 'Registrar Serviço na Lista'
     // Evento para o botão 'Registrar Serviço na Lista'
     btnRegistrar.addEventListener('click', (e) => {
         e.preventDefault();
@@ -152,8 +184,6 @@ if (document.getElementById('form-servico')) {
         const nome3 = formServico.elements.funcionario3.value;
         const nome4 = formServico.elements.funcionario4.value;
         const nome5 = formServico.elements.funcionario5.value;
-
-
 
         const nomesArray = [nome1, nome2, nome3, nome4, nome5].filter(nome => nome !== '');
 
@@ -172,7 +202,6 @@ if (document.getElementById('form-servico')) {
         const totalMinutosInicio = hInicio * 60 + mInicio;
         const totalMinutosTermino = hTermino * 60 + mTermino;
 
-        // A validação agora tem uma exceção para o 3º Turno
         if (totalMinutosInicio >= totalMinutosTermino && turnoSelecionado !== '3 turno') {
             alert("Atenção: A hora de início não pode ser maior ou igual à hora de término. Por favor, corrija.");
             return;
@@ -190,10 +219,19 @@ if (document.getElementById('form-servico')) {
 
         servicosPendentes.push(novoServico);
         mensagem.textContent = "Serviço adicionado à lista!";
-        formServico.reset();
+
+        // Salva os nomes dos funcionários antes de resetar o formulário
+        const nomesParaPreencher = [...nomesArray]; // Cria uma cópia dos nomes atuais
+
+        formServico.reset(); // Reseta o formulário principal
         salvarServicosNoLocalStorage();
         atualizarTabelaPendentes();
+
+        // Agora, preenche os inputs de funcionário com os nomes que acabaram de ser registrados
+        // Isso garante que eles fiquem preenchidos APÓS o reset do resto do formulário
+        preencherInputsFuncionarios(nomesParaPreencher);
     });
+
     // Evento para o botão 'Enviar Todos para o Banco de Dados'
     btnEnviarTodos.addEventListener('click', async () => {
         if (servicosPendentes.length === 0) {
@@ -207,14 +245,11 @@ if (document.getElementById('form-servico')) {
             return;
         }
 
-        // Desabilitar o botão e mudar o texto para indicar que está em processamento
         btnEnviarTodos.disabled = true;
         btnEnviarTodos.textContent = 'Enviando...';
         mensagem.textContent = 'Enviando serviços, por favor aguarde...';
 
         try {
-            // Use Promise.all para enviar todos os serviços em paralelo
-            // Isso pode ser mais rápido, mas a alteração principal é o controle de estado do botão
             const promises = [];
             for (const servico of servicosPendentes) {
                 for (const nome of servico.nomesFuncionarios) {
@@ -234,7 +269,6 @@ if (document.getElementById('form-servico')) {
             }
             await Promise.all(promises);
 
-            // Se tudo deu certo, atualiza a mensagem e limpa a lista
             mensagem.textContent = "Todos os serviços foram registrados com sucesso!";
             servicosPendentes = [];
             localStorage.removeItem('servicosPendentes');
@@ -243,7 +277,6 @@ if (document.getElementById('form-servico')) {
             console.error("Erro ao adicionar documentos: ", error);
             mensagem.textContent = "Erro ao registrar serviços. Verifique o console para mais detalhes.";
         } finally {
-            // Reabilitar o botão e restaurar o texto original, independentemente do sucesso ou falha
             btnEnviarTodos.disabled = false;
             btnEnviarTodos.textContent = 'Enviar Todos para o Banco de Dados';
         }
