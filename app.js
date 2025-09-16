@@ -202,30 +202,39 @@ if (document.getElementById('form-servico')) {
         }
 
         const confirmarEnvio = confirm("Tem certeza que deseja enviar todos os serviços?");
-    
 
         if (!confirmarEnvio) {
-            // Opcional: Você pode adicionar uma mensagem para o usuário
-            console.log("Envio cancelado.");
             return;
         }
 
+        // Desabilitar o botão e mudar o texto para indicar que está em processamento
+        btnEnviarTodos.disabled = true;
+        btnEnviarTodos.textContent = 'Enviando...';
+        mensagem.textContent = 'Enviando serviços, por favor aguarde...';
+
         try {
+            // Use Promise.all para enviar todos os serviços em paralelo
+            // Isso pode ser mais rápido, mas a alteração principal é o controle de estado do botão
+            const promises = [];
             for (const servico of servicosPendentes) {
                 for (const nome of servico.nomesFuncionarios) {
-                    await addDoc(collection(db, "servicos"), {
-                        nomeFuncionario: nome,
-                        dia: servico.dia,
-                        horaInicio: servico.horaInicio,
-                        horaTermino: servico.horaTermino,
-                        nomeServico: servico.nomeServico,
-                        tipoServico: servico.tipoServico,
-                        turno: servico.turno,
-                        dataRegistro: new Date(servico.dia.replace(/-/g, '\/'))
-                    });
+                    promises.push(
+                        addDoc(collection(db, "servicos"), {
+                            nomeFuncionario: nome,
+                            dia: servico.dia,
+                            horaInicio: servico.horaInicio,
+                            horaTermino: servico.horaTermino,
+                            nomeServico: servico.nomeServico,
+                            tipoServico: servico.tipoServico,
+                            turno: servico.turno,
+                            dataRegistro: new Date(servico.dia.replace(/-/g, '\/'))
+                        })
+                    );
                 }
             }
+            await Promise.all(promises);
 
+            // Se tudo deu certo, atualiza a mensagem e limpa a lista
             mensagem.textContent = "Todos os serviços foram registrados com sucesso!";
             servicosPendentes = [];
             localStorage.removeItem('servicosPendentes');
@@ -233,6 +242,10 @@ if (document.getElementById('form-servico')) {
         } catch (error) {
             console.error("Erro ao adicionar documentos: ", error);
             mensagem.textContent = "Erro ao registrar serviços. Verifique o console para mais detalhes.";
+        } finally {
+            // Reabilitar o botão e restaurar o texto original, independentemente do sucesso ou falha
+            btnEnviarTodos.disabled = false;
+            btnEnviarTodos.textContent = 'Enviar Todos para o Banco de Dados';
         }
     });
 
@@ -454,7 +467,7 @@ if (document.getElementById('tabela-servicos')) {
         containerHorasDisponiveis.innerHTML = tabelaHTML;
     }
     // Função para exportar a tabela visível para PDF
-     async function exportarParaPDF(mesSelecionado) {
+    async function exportarParaPDF(mesSelecionado) {
         if (!mesSelecionado) return;
 
         const [ano, mes] = mesSelecionado.split('-').map(Number);
