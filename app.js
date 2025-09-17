@@ -55,7 +55,6 @@ if (document.getElementById('form-login')) {
 }
 
 // Lógica para a página de registro de serviço (index.html)
-// Lógica para a página de registro de serviço (index.html)
 if (document.getElementById('form-servico')) {
     const formServico = document.getElementById('form-servico');
     const btnRegistrar = document.getElementById('btn-registrar');
@@ -129,15 +128,17 @@ if (document.getElementById('form-servico')) {
             });
             btnEnviarTodos.style.display = 'block';
 
-            // Preenche os inputs de funcionário com o último serviço adicionado
+            // Preenche os inputs do formulário com o último serviço adicionado
             const ultimoServico = servicosPendentes[servicosPendentes.length - 1];
             preencherInputsFuncionarios(ultimoServico.nomesFuncionarios);
+            formServico.elements.dia.value = ultimoServico.dia;
 
         } else {
             tabelaContainerPendentes.style.display = 'none';
             btnEnviarTodos.style.display = 'none';
-            // Se a lista estiver vazia, limpa os inputs de funcionário
+            // Se a lista estiver vazia, limpa todos os inputs
             limparInputsFuncionarios();
+            formServico.elements.dia.value = '';
         }
     }
 
@@ -148,12 +149,7 @@ if (document.getElementById('form-servico')) {
             const servicoParaEditar = servicosPendentes[index];
 
             // Preenche os inputs com os dados do serviço a ser editado
-            formServico.elements.funcionario1.value = servicoParaEditar.nomesFuncionarios[0] || '';
-            formServico.elements.funcionario2.value = servicoParaEditar.nomesFuncionarios[1] || '';
-            formServico.elements.funcionario3.value = servicoParaEditar.nomesFuncionarios[2] || '';
-            formServico.elements.funcionario4.value = servicoParaEditar.nomesFuncionarios[3] || '';
-            formServico.elements.funcionario5.value = servicoParaEditar.nomesFuncionarios[4] || '';
-
+            preencherInputsFuncionarios(servicoParaEditar.nomesFuncionarios);
             formServico.elements.dia.value = servicoParaEditar.dia;
             formServico.elements.horaInicio.value = servicoParaEditar.horaInicio;
             formServico.elements.horaTermino.value = servicoParaEditar.horaTermino;
@@ -179,13 +175,13 @@ if (document.getElementById('form-servico')) {
             return;
         }
 
-        const nome1 = formServico.elements.funcionario1.value;
-        const nome2 = formServico.elements.funcionario2.value;
-        const nome3 = formServico.elements.funcionario3.value;
-        const nome4 = formServico.elements.funcionario4.value;
-        const nome5 = formServico.elements.funcionario5.value;
-
-        const nomesArray = [nome1, nome2, nome3, nome4, nome5].filter(nome => nome !== '');
+        const nomesArray = [
+            formServico.elements.funcionario1.value,
+            formServico.elements.funcionario2.value,
+            formServico.elements.funcionario3.value,
+            formServico.elements.funcionario4.value,
+            formServico.elements.funcionario5.value
+        ].filter(nome => nome !== '');
 
         if (nomesArray.length === 0) {
             mensagem.textContent = "Selecione pelo menos um funcionário.";
@@ -220,16 +216,15 @@ if (document.getElementById('form-servico')) {
         servicosPendentes.push(novoServico);
         mensagem.textContent = "Serviço adicionado à lista!";
 
-        // Salva os nomes dos funcionários antes de resetar o formulário
-        const nomesParaPreencher = [...nomesArray]; // Cria uma cópia dos nomes atuais
-
-        formServico.reset(); // Reseta o formulário principal
         salvarServicosNoLocalStorage();
         atualizarTabelaPendentes();
 
-        // Agora, preenche os inputs de funcionário com os nomes que acabaram de ser registrados
-        // Isso garante que eles fiquem preenchidos APÓS o reset do resto do formulário
-        preencherInputsFuncionarios(nomesParaPreencher);
+        // Limpa APENAS os campos que devem ser limpos após o registro
+        formServico.elements.horaInicio.value = '';
+        formServico.elements.horaTermino.value = '';
+        formServico.elements.nomeServico.value = '';
+        formServico.elements.tipoServico.value = formServico.elements.tipoServico.options[0].value;
+        formServico.elements.turno.value = formServico.elements.turno.options[0].value;
     });
 
     // Evento para o botão 'Enviar Todos para o Banco de Dados'
