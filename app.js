@@ -84,25 +84,21 @@ if (document.getElementById('form-servico')) {
         formServico.elements.funcionario2.value = '';
         formServico.elements.funcionario3.value = '';
         formServico.elements.funcionario4.value = '';
-        formServico.elements.funcionario5.value = '';
     }
 
     // Função para preencher os inputs de funcionário
     function preencherInputsFuncionarios(nomes) {
-        // Limpa os campos antes de preencher para garantir que não fiquem valores antigos
         limparInputsFuncionarios();
         if (nomes && nomes.length > 0) {
             formServico.elements.funcionario1.value = nomes[0] || '';
-            formServico.elements.funcionario2.value = nomes[1] || '';
-            formServico.elements.funcionario3.value = nomes[2] || '';
-            formServico.elements.funcionario4.value = nomes[3] || '';
-            formServico.elements.funcionario5.value = nomes[4] || '';
+            if (nomes.length > 1) formServico.elements.funcionario2.value = nomes[1] || '';
+            if (nomes.length > 2) formServico.elements.funcionario3.value = nomes[2] || '';
+            if (nomes.length > 3) formServico.elements.funcionario4.value = nomes[3] || '';
         }
     }
 
-    // Função para atualizar a tabela na tela
     function atualizarTabelaPendentes() {
-        tabelaCorpoPendentes.innerHTML = ''; // Limpa a tabela
+        tabelaCorpoPendentes.innerHTML = '';
         if (servicosPendentes.length > 0) {
             tabelaContainerPendentes.style.display = 'block';
             servicosPendentes.forEach((servico, index) => {
@@ -125,31 +121,42 @@ if (document.getElementById('form-servico')) {
                 btnEditar.classList.add('btn-editar');
                 btnEditar.setAttribute('data-index', index);
                 celulaAcoes.appendChild(btnEditar);
+
+                // ===== INÍCIO DA ALTERAÇÃO =====
+                const btnExcluir = document.createElement('button');
+                btnExcluir.textContent = 'Excluir';
+                btnExcluir.classList.add('btn-excluir'); // Adiciona uma classe para identificar o botão
+                btnExcluir.setAttribute('data-index', index); // Usa o mesmo índice para saber qual item remover
+                celulaAcoes.appendChild(btnExcluir);
+                // ===== FIM DA ALTERAÇÃO =====
             });
             btnEnviarTodos.style.display = 'block';
 
             // Preenche os inputs do formulário com o último serviço adicionado
-            const ultimoServico = servicosPendentes[servicosPendentes.length - 1];
-            preencherInputsFuncionarios(ultimoServico.nomesFuncionarios);
-            formServico.elements.dia.value = ultimoServico.dia;
+            const ultimoServicoAdicionado = servicosPendentes[servicosPendentes.length - 1];
+            preencherInputsFuncionarios(ultimoServicoAdicionado.nomesFuncionarios);
+            formServico.elements.dia.value = ultimoServicoAdicionado.dia;
 
         } else {
             tabelaContainerPendentes.style.display = 'none';
             btnEnviarTodos.style.display = 'none';
-            // Se a lista estiver vazia, limpa todos os inputs
+            // Quando a lista está vazia, limpa todos os campos
             limparInputsFuncionarios();
             formServico.elements.dia.value = '';
         }
     }
 
-    // Lógica para o botão de edição
     tabelaCorpoPendentes.addEventListener('click', (e) => {
+        // Lógica para o botão EDITAR
         if (e.target.classList.contains('btn-editar')) {
             const index = e.target.getAttribute('data-index');
             const servicoParaEditar = servicosPendentes[index];
 
             // Preenche os inputs com os dados do serviço a ser editado
-            preencherInputsFuncionarios(servicoParaEditar.nomesFuncionarios);
+            formServico.elements.funcionario1.value = servicoParaEditar.nomesFuncionarios[0] || '';
+            formServico.elements.funcionario2.value = servicoParaEditar.nomesFuncionarios[1] || '';
+            formServico.elements.funcionario3.value = servicoParaEditar.nomesFuncionarios[2] || '';
+            formServico.elements.funcionario4.value = servicoParaEditar.nomesFuncionarios[3] || '';
             formServico.elements.dia.value = servicoParaEditar.dia;
             formServico.elements.horaInicio.value = servicoParaEditar.horaInicio;
             formServico.elements.horaTermino.value = servicoParaEditar.horaTermino;
@@ -164,8 +171,28 @@ if (document.getElementById('form-servico')) {
 
             mensagem.textContent = "Serviço carregado no formulário para edição.";
         }
-    });
 
+        // ===== INÍCIO DA ALTERAÇÃO =====
+        // Lógica para o botão EXCLUIR
+        if (e.target.classList.contains('btn-excluir')) {
+            const index = e.target.getAttribute('data-index');
+
+            // Pede confirmação ao usuário antes de excluir
+            if (confirm("Tem certeza que deseja excluir este serviço da lista?")) {
+                // Remove o serviço do array 'servicosPendentes'
+                servicosPendentes.splice(index, 1);
+
+                // Salva a lista atualizada no localStorage
+                salvarServicosNoLocalStorage();
+
+                // Atualiza a tabela na tela para refletir a remoção
+                atualizarTabelaPendentes();
+
+                mensagem.textContent = "Serviço removido da lista.";
+            }
+        }
+        // ===== FIM DA ALTERAÇÃO =====
+    });
     // Evento para o botão 'Registrar Serviço na Lista'
     btnRegistrar.addEventListener('click', (e) => {
         e.preventDefault();
@@ -175,15 +202,15 @@ if (document.getElementById('form-servico')) {
             return;
         }
 
-        const nomesArray = [
-            formServico.elements.funcionario1.value,
-            formServico.elements.funcionario2.value,
-            formServico.elements.funcionario3.value,
-            formServico.elements.funcionario4.value,
-            formServico.elements.funcionario5.value
-        ].filter(nome => nome !== '');
+        const nomesSelecionados = [];
+        for (let i = 1; i <= 5; i++) {
+            const selectElement = formServico.elements[`funcionario${i}`];
+            if (selectElement && selectElement.value) {
+                nomesSelecionados.push(selectElement.value);
+            }
+        }
 
-        if (nomesArray.length === 0) {
+        if (nomesSelecionados.length === 0) {
             mensagem.textContent = "Selecione pelo menos um funcionário.";
             return;
         }
@@ -204,7 +231,7 @@ if (document.getElementById('form-servico')) {
         }
 
         const novoServico = {
-            nomesFuncionarios: nomesArray,
+            nomesFuncionarios: nomesSelecionados,
             dia: formServico.elements.dia.value,
             horaInicio: formServico.elements.horaInicio.value,
             horaTermino: formServico.elements.horaTermino.value,
@@ -219,7 +246,6 @@ if (document.getElementById('form-servico')) {
         salvarServicosNoLocalStorage();
         atualizarTabelaPendentes();
 
-        // Limpa APENAS os campos que devem ser limpos após o registro
         formServico.elements.horaInicio.value = '';
         formServico.elements.horaTermino.value = '';
         formServico.elements.nomeServico.value = '';
