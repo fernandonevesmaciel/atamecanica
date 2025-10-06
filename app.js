@@ -133,9 +133,9 @@ if (document.getElementById('form-servico')) {
             btnEnviarTodos.style.display = 'block';
 
             // Preenche os inputs do formulário com o último serviço adicionado
-            const ultimoServicoAdicionado = servicosPendentes[servicosPendentes.length - 1];
-            preencherInputsFuncionarios(ultimoServicoAdicionado.nomesFuncionarios);
-            formServico.elements.dia.value = ultimoServicoAdicionado.dia;
+            const ultimoServico = servicosPendentes[servicosPendentes.length - 1];
+            preencherInputsFuncionarios(ultimoServico.nomesFuncionarios);
+            formServico.elements.dia.value = ultimoServico.dia;
 
         } else {
             tabelaContainerPendentes.style.display = 'none';
@@ -250,7 +250,8 @@ if (document.getElementById('form-servico')) {
         formServico.elements.horaTermino.value = '';
         formServico.elements.nomeServico.value = '';
         formServico.elements.tipoServico.value = formServico.elements.tipoServico.options[0].value;
-        formServico.elements.turno.value = formServico.elements.turno.options[0].value;
+        // ALTERAÇÃO 2: A linha abaixo foi removida para não resetar o turno
+        // formServico.elements.turno.value = formServico.elements.turno.options[0].value;
     });
 
     // Evento para o botão 'Enviar Todos para o Banco de Dados'
