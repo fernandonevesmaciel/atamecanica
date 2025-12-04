@@ -344,7 +344,6 @@ if (document.getElementById('tabela-servicos')) {
         "Wanner": 440,
         "Sandro": 440,
         "Victor": 440,
-        "Ericky": 440,
         "Endrew": 440,
         "André Bacceto": 440,
         "Guilherme": 440,
