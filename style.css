@@ -353,6 +353,145 @@ th {
     background-color: #c82333; /* Tom mais escuro de vermelho */
 }
 
+/* Botão Flutuante */
+.floating-btn {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    width: 60px;
+    height: 60px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 60px;
+    font-size: 30px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    transition: transform 0.2s;
+}
+
+.floating-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Sidebar - Aumentamos um pouco a largura para caber melhor */
+.sidebar {
+    width: 320px; /* Estava meio apertado, aumentei um pouco */
+    background-color: #fff;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+    padding: 20px;
+    position: fixed;
+    top: 0;
+    right: -360px; /* Deve ser igual a largura negativa para esconder */
+    height: 100%;
+    transition: right 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.sidebar.aberto {
+    right: 0;
+}
+
+/* Cabeçalho do Calendário (Botões e Mês) */
+.calendar-controls {
+    display: flex;
+    justify-content: space-between; /* Espalha os itens: Botão - Texto - Botão */
+    align-items: center; /* Centraliza verticalmente */
+    margin: 15px 0;
+    width: 100%;
+}
+
+.calendar-controls button {
+    width: 40px; /* Largura fixa para o botão não esticar nem encolher */
+    height: 40px;
+    background-color: #4169E1; /* Azul Royal */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    flex-shrink: 0; /* IMPEDE o botão de ser esmagado */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-controls button:hover {
+    background-color: #3154b3;
+}
+
+/* O Texto do Mês */
+.calendar-controls span {
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: capitalize; /* Primeira letra maiúscula */
+    white-space: nowrap; /* IMPEDE o texto de quebrar linha */
+    margin: 0 10px; /* Dá um respiro nas laterais */
+    text-align: center;
+    flex-grow: 1;
+}
+
+/* A Grade dos Dias */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px; /* Espaço entre os quadradinhos */
+    margin-top: 10px;
+}
+
+/* Cabeçalho dos dias da semana (D S T Q...) */
+.calendar-day-header {
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+/* Os dias (quadradinhos) */
+.calendar-day {
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+    user-select: none;
+}
+
+/* Dia com serviço feito (Verde) */
+.calendar-day.tem-ata {
+    background-color: #28a745;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Legenda */
+.legenda {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    font-size: 14px;
+}
+.item-legenda {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.bolinha {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.bolinha.verde { background-color: #28a745; }
+.bolinha.cinza { background-color: #e0e0e0; border: 1px solid #ccc; }
+
 @media print {
   table, tr, td {
     page-break-inside: avoid !important;
