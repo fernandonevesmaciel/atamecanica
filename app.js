@@ -889,15 +889,16 @@ if (document.getElementById('tabela-servicos')) {
 
             const tiposServico = [
                 "ajuste/reparo/concerto",
-                "emergencial",
-                "inspecao/checklist",
                 "limpeza_e_organizacao",
+                "lubrificacao",
                 "melhoria",
+                "inspecao/checklist",
                 "preventiva",
                 "programada",
                 "qualidade",
+                "emergencial",
                 "fabricacao_montagem",
-                "lubrificacao"
+                
             ];
 
             const [ano, mes] = mesSelecionado.split('-').map(Number);
